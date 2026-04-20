@@ -30,5 +30,5 @@ COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 EXPOSE 4000
-# At container start, sync schema (idempotent) and launch server. docker-compose overrides this to also seed.
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/index.js"]
+# At container start, sync schema (idempotent), seed the db, and launch server.
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npx tsx prisma/seed.ts && node dist/index.js"]

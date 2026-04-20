@@ -12,7 +12,7 @@ import { initSocket } from './ws/index.js';
 const app = express();
 const server = createServer(app);
 
-app.use(cors({ origin: config.frontendOrigin, credentials: true }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use(metricsMiddleware);
 

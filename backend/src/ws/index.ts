@@ -15,7 +15,7 @@ export function emitToOrg(orgId: string, event: string, payload: unknown) {
 
 export function initSocket(server: HttpServer) {
   io = new IoServer(server, {
-    cors: { origin: config.frontendOrigin, credentials: true },
+    cors: { origin: true, credentials: true },
     path: '/socket.io',
   });
 
