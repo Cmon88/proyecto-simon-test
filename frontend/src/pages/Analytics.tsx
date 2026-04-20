@@ -120,11 +120,6 @@ export default function Analytics() {
         </table>
       </div>
 
-      <p className="text-xs text-slate-400">
-        Para más detalle, consulta también los dashboards en Grafana (<code>localhost:3000</code>) —{' '}
-        métricas técnicas (latencia p95, error rate, conexiones WS) viven ahí.
-        {' '}Total satisfacción: <strong>{formatPercent(ratings?.total && (ratings.buckets.filter(b => b.rating >= 4).reduce((s, b) => s + b.count, 0) / ratings.total), 1)}</strong>
-      </p>
     </div>
   );
 }
