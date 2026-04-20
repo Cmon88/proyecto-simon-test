@@ -47,8 +47,11 @@ router.get(
   '/trend',
   asyncHandler(async (req, res) => {
     const orgId = req.auth!.org_id;
-    const days = 30;    // OPTIMIZED SQL: Daily Volume query using raw SQL to group dates rapidly.
-    // Relies strictly on `orgId` preventing implicit data leaks cross-org.    const rows: { day: Date; count: bigint }[] = await prisma.$queryRaw(
+    const days = 30;
+    
+    // OPTIMIZED SQL: Daily Volume query using raw SQL to group dates rapidly.
+    // Relies strictly on `orgId` preventing implicit data leaks cross-org.
+    const rows: { day: Date; count: bigint }[] = await prisma.$queryRaw(
       Prisma.sql`
         SELECT date_trunc('day', "startedAt") AS day, COUNT(*)::bigint AS count
         FROM "Conversation"

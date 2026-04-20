@@ -2,7 +2,6 @@ import { Server as HttpServer } from 'http';
 import { Server as IoServer, Socket } from 'socket.io';
 import { MessageRole } from '@prisma/client';
 import { verifyToken } from '../auth/middleware.js';
-import { config } from '../config.js';
 import { prisma } from '../db.js';
 import { streamChat, ChatTurn } from '../ai/client.js';
 import { wsActiveConnections } from '../metrics.js';
