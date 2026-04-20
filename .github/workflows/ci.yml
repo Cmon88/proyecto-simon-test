@@ -19,7 +19,6 @@ jobs:
       with:
         node-version: '18'
 
-    # Backend
     - name: Install dependencies (Backend)
       run: npm install
       working-directory: ./backend
@@ -28,7 +27,6 @@ jobs:
       run: npm run lint --if-present
       working-directory: ./backend
 
-    # Frontend
     - name: Install dependencies (Frontend)
       run: npm install
       working-directory: ./frontend
@@ -37,7 +35,6 @@ jobs:
       run: npm run lint --if-present
       working-directory: ./frontend
 
-    # Build Images
     - name: Build Backend Docker Image
       run: docker build -t proyectosimon-backend ./backend
 
