@@ -42,5 +42,5 @@ initSocket(server);
 
 server.listen(config.port, () => {
   // eslint-disable-next-line no-console
-  console.log(`🚀 Simon backend listening on :${config.port} (env=${config.nodeEnv})`);
+  console.log(`🚀 AI Chat backend listening on :${config.port} (env=${config.nodeEnv})`);
 });

@@ -23,8 +23,8 @@ export function Sidebar() {
           <Bot size={18} />
         </div>
         <div>
-          <div className="font-semibold text-slate-800">Simon</div>
-          <div className="text-xs text-slate-500">AI Conversations</div>
+          <div className="font-semibold text-slate-800">AI Chat</div>
+          <div className="text-xs text-slate-500">Dashboard</div>
         </div>
       </div>
 

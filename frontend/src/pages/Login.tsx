@@ -30,7 +30,7 @@ export default function Login() {
             <Bot size={22} />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-slate-800">Simon</h1>
+            <h1 className="text-xl font-semibold text-slate-800">AI Chat</h1>
             <p className="text-sm text-slate-500">Dashboard de conversaciones de IA</p>
           </div>
         </div>

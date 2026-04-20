@@ -1,4 +1,4 @@
-﻿# Simon · AI Conversations Dashboard
+﻿# AI Conversations Dashboard
 
 > Multi-tenant dashboard to monitor, interact with, and analyze AI agent conversations.
 > Features token-by-token streaming, observability with Prometheus + Grafana, and declarative infrastructure with Terraform on Render.
