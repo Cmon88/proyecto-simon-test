@@ -1,4 +1,4 @@
-﻿terraform {
+terraform {
   required_providers {
     render = {
       source  = "render-oss/render"
@@ -17,7 +17,6 @@ variable "render_api_key" {
   sensitive   = true
 }
 
-# Postgres Database
 resource "render_postgres" "db" {
   name      = "proyectosimon-db"
   plan      = "free"
@@ -25,46 +24,43 @@ resource "render_postgres" "db" {
   version   = "15"
 }
 
-# Backend web service
-resource "render_service" "backend" {
+resource "render_web_service" "backend" {
   name       = "proyectosimon-backend"
-  type       = "web_service"
-  repo       = "https://github.com/tu-usuario/proyecto-simon" # TODO: Update with your repo
-  branch     = "main"
-  env        = "docker"
   region     = "ohio"
   plan       = "free"
   
-  docker_details {
-    docker_context = "./backend"
-    docker_file    = "Dockerfile"
+  runtime_source = {
+    docker = {
+      repo_url       = "https://github.com/Cmon88/proyecto-simon-test"
+      branch         = "main"
+      context        = "./backend"
+      dockerfile_path = "./backend/Dockerfile"
+    }
   }
 
   env_vars = {
-    DATABASE_URL = { value = render_postgres.db.connection_string }
+    DATABASE_URL = { value = render_postgres.db.connection_info.internal_connection_string }
     NODE_ENV     = { value = "production" }
     PORT         = { value = "4000" }
     AI_PROVIDER  = { value = "groq" }
     AI_MODEL     = { value = "llama-3.1-8b-instant" }
     AI_BASE_URL  = { value = "https://api.groq.com/openai/v1" }
-    # Set AI_API_KEY as a secret manually in the Render dashboard
-    # FRONTEND_ORIGIN = { value = "https://tu-frontend.onrender.com" }
+    AI_API_KEY   = { value = "PASA_AI_KEY_POR_VARIABLE" }
   }
 }
 
-# Frontend static site or web service
-resource "render_service" "frontend" {
+resource "render_web_service" "frontend" {
   name       = "proyectosimon-frontend"
-  type       = "web_service"
-  repo       = "https://github.com/tu-usuario/proyecto-simon" # TODO: Update
-  branch     = "main"
-  env        = "docker"
   region     = "ohio"
   plan       = "free"
 
-  docker_details {
-    docker_context = "./frontend"
-    docker_file    = "Dockerfile"
+  runtime_source = {
+    docker = {
+      repo_url       = "https://github.com/Cmon88/proyecto-simon-test"
+      branch         = "main"
+      context        = "./frontend"
+      dockerfile_path = "./frontend/Dockerfile"
+    }
   }
 
   env_vars = {
@@ -72,3 +68,4 @@ resource "render_service" "frontend" {
     VITE_WS_URL  = { value = "https://proyectosimon-backend.onrender.com" }
   }
 }
+
