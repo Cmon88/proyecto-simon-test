@@ -15,6 +15,31 @@ export default function Resumen() {
     queryFn: () => api.get<TrendPoint[]>('/api/analytics/trend'),
   });
 
+  const getPercentTrend = (current?: number, prev?: number, suffix = '') => {
+    if (current == null || prev == null) return undefined;
+    const delta = current - prev;
+    if (delta === 0) return { text: 'Estable', isPositive: null };
+    if (prev === 0) return { text: `+${current} ${suffix}`, isPositive: true };
+    const pct = Math.round((delta / prev) * 100);
+    return { text: `${pct > 0 ? '+' : ''}${pct}% ${suffix}`, isPositive: delta > 0 };
+  };
+
+  const getRateTrend = (current: number | null | undefined, prev: number | null | undefined, suffix = '') => {
+    if (current == null || prev == null) return undefined;
+    const delta = current - prev;
+    if (delta === 0) return { text: 'Estable', isPositive: null };
+    const pct = (delta * 100).toFixed(1);
+    return { text: `${delta > 0 ? '+' : ''}${pct}% ${suffix}`, isPositive: delta > 0 };
+  };
+
+  const getLatencyTrend = (current: number | null | undefined, prev: number | null | undefined) => {
+    if (current == null || prev == null) return undefined;
+    const delta = current - prev;
+    if (Math.abs(delta) < 0.01) return { text: 'Estable', isPositive: null };
+    const isImprovement = delta < 0;
+    return { text: `${isImprovement ? '-' : '+'}${Math.abs(delta).toFixed(2)}s${isImprovement ? ' mejora' : ' peor'}`, isPositive: isImprovement };
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -27,7 +52,7 @@ export default function Resumen() {
           hint="Total de conversaciones iniciadas"
           icon={Calendar}
           accent="blue"
-          trend={summary ? { text: '+12% vs ayer', isPositive: true } : undefined}
+          trend={getPercentTrend(summary?.conversations.today, summary?.conversations.yesterday, 'vs ayer')}
         />
         <KpiCard
           label="Satisfacción"
@@ -35,7 +60,7 @@ export default function Resumen() {
           hint="Conversaciones con rating ≥ 4"
           icon={ThumbsUp}
           accent="green"
-          trend={summary ? { text: '+2.1% vs semana pasada', isPositive: true } : undefined}
+          trend={getRateTrend(summary?.satisfactionRate, summary?.prevSatisfactionRate, 'vs sem. pasada')}
         />
         <KpiCard
           label="Tiempo Respuesta"
@@ -43,7 +68,7 @@ export default function Resumen() {
           hint="Promedio de respuesta de IA"
           icon={Timer}
           accent="amber"
-          trend={summary ? { text: '-0.2s mejora', isPositive: false } : undefined}
+          trend={getLatencyTrend(summary?.avgLatencySec, summary?.prevAvgLatencySec)}
         />
         <KpiCard
           label="Conversaciones Semana"
@@ -51,7 +76,7 @@ export default function Resumen() {
           hint="Total semanal"
           icon={MessageSquare}
           accent="violet"
-          trend={summary ? { text: 'Estable', isPositive: null } : undefined}
+          trend={getPercentTrend(summary?.conversations.week, summary?.conversations.prevWeek, 'vs sem. pasada')}
         />
       </div>
 

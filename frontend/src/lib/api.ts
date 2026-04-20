@@ -80,10 +80,12 @@ export interface Prompt {
 }
 
 export interface SummaryDto {
-  conversations: { today: number; week: number; month: number };
+  conversations: { today: number; yesterday: number; week: number; prevWeek: number; month: number };
   satisfactionRate: number | null;
+  prevSatisfactionRate: number | null;
   avgRating: number | null;
   avgLatencySec: number | null;
+  prevAvgLatencySec: number | null;
 }
 
 export interface TrendPoint { date: string; count: number }

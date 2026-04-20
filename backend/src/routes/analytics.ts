@@ -16,10 +16,20 @@ router.get(
     const startOfDay = new Date(now); startOfDay.setHours(0, 0, 0, 0);
     const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate() - 7);
     const startOfMonth = new Date(now); startOfMonth.setDate(now.getDate() - 30);
+    
+    // For calculating trends
+    const startOfYesterday = new Date(startOfDay); startOfYesterday.setDate(startOfDay.getDate() - 1);
+    const startOfPrevWeek = new Date(startOfWeek); startOfPrevWeek.setDate(startOfWeek.getDate() - 7);
 
-    const [today, week, month, ratingAgg, latencyAgg, ratedCount, satisfactory] = await Promise.all([
+    const [
+      today, yesterday, week, prevWeek, month, 
+      ratingAgg, latencyAgg, prevLatencyAgg,
+      ratedCount, satisfactory, prevRatedCount, prevSatisfactory
+    ] = await Promise.all([
       prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfDay } } }),
+      prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfYesterday, lt: startOfDay } } }),
       prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfWeek } } }),
+      prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfPrevWeek, lt: startOfWeek } } }),
       prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfMonth } } }),
       prisma.conversation.aggregate({
         where: { orgId, rating: { not: null } },
@@ -29,19 +39,23 @@ router.get(
         where: { orgId, role: MessageRole.ASSISTANT, latencyMs: { not: null } },
         _avg: { latencyMs: true },
       }),
-      prisma.conversation.count({ where: { orgId, rating: { not: null } } }),
-      prisma.conversation.count({ where: { orgId, rating: { gte: 4 } } }),
+      prisma.message.aggregate({
+        where: { orgId, role: MessageRole.ASSISTANT, latencyMs: { not: null }, createdAt: { gte: startOfPrevWeek, lt: startOfWeek } },
+        _avg: { latencyMs: true },
+      }),
+      prisma.conversation.count({ where: { orgId, rating: { not: null } } }),   
+      prisma.conversation.count({ where: { orgId, rating: { gte: 4 } } }),      
+      prisma.conversation.count({ where: { orgId, rating: { not: null }, startedAt: { gte: startOfPrevWeek, lt: startOfWeek } } }),
+      prisma.conversation.count({ where: { orgId, rating: { gte: 4 }, startedAt: { gte: startOfPrevWeek, lt: startOfWeek } } }),
     ]);
 
     res.json({
-      conversations: { today, week, month },
+      conversations: { today, yesterday, week, prevWeek, month },
       satisfactionRate: ratedCount === 0 ? null : satisfactory / ratedCount,
+      prevSatisfactionRate: prevRatedCount === 0 ? null : prevSatisfactory / prevRatedCount,
       avgRating: ratingAgg._avg.rating,
       avgLatencySec: latencyAgg._avg.latencyMs ? latencyAgg._avg.latencyMs / 1000 : null,
-    });
-  }),
-);
-
+      prevAvgLatencySec: prevLatencyAgg._avg.latencyMs ? prevLatencyAgg._avg.latencyMs / 1000 : null,
 // Daily volume trend over last 30 days.
 router.get(
   '/trend',
