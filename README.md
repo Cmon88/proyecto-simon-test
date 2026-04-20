@@ -15,8 +15,8 @@
 
 | Organization | Email | Password |
 |---|---|---|
-| Acme Corp | \lice@acme.com\ | \password123\ |
-| Globex | \ob@globex.com\ | \password123\ |
+| Acme Corp | \alice@acme.com\ | \password123\ |
+| Globex | \bob@globex.com\ | \password123\ |
 
 > *Note: Render's free tier spins down after 15m of inactivity. The first login/request might take ~50 seconds to wake up the backend. Please be patient!*
 
@@ -130,7 +130,8 @@ flowchart LR
 6. **Clickable Table Rows:** Rows react to hover and are fully clickable, improving navigation over traditional and precise "View" buttons.
 7. **Strict Multi-tenant UI Context:** The sidebar continuously displays the active user's Organization Name so they never lose context of which tenant's data they are mutating.
 8. **Demo Login Presets:** The initial Login screen features "Quick Login" buttons to access Acme Corp and Globex immediately. This removes friction for reviewers wanting to test multi-tenant boundaries out of the box.
-9. **Toast Notifications System:** Used \eact-hot-toast\ for immediate feedback (e.g. Rating saved, Server Errors, Settings updated) replacing ugly and blocking native alert dialogs.
+9. **Toast Notifications System:** Used \
+eact-hot-toast\ for immediate feedback (e.g. Rating saved, Server Errors, Settings updated) replacing ugly and blocking native alert dialogs.
 
 ---
 
