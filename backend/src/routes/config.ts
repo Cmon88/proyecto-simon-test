@@ -12,7 +12,7 @@ router.get('/ai', (req, res) => {
     : 'No configurada (Modo Mock)';
 
   res.json({
-    provider: 'Groq (OpenAI-compatible)',
+    provider: config.ai.provider === 'groq' ? 'Groq (OpenAI-compatible)' : config.ai.provider,
     model: config.ai.model,
     baseUrl: config.ai.baseUrl,
     apiKeyMasked: masked,
