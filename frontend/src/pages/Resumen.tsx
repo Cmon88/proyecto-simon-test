@@ -19,8 +19,7 @@ export default function Resumen() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-slate-900">Resumen</h1>
-        <p className="text-sm text-slate-500 mt-1">Vista general del rendimiento de las conversaciones con IA</p>
-
+        <p className="text-sm text-slate-500 mt-1">Vista general del rendimiento de las conversaciones con IA</p>      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
           label="Conversaciones Hoy"
