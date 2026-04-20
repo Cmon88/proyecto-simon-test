@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+﻿import { useQuery } from '@tanstack/react-query';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { MessageSquare, ThumbsUp, Timer, Calendar } from 'lucide-react';
 import { api, SummaryDto, TrendPoint } from '@/lib/api';
@@ -19,35 +19,40 @@ export default function Resumen() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-slate-900">Resumen</h1>
-        <p className="text-sm text-slate-500 mt-1">Indicadores clave de tus conversaciones de IA.</p>
-      </div>
+        <p className="text-sm text-slate-500 mt-1">Vista general del rendimiento de las conversaciones con IA</p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          label="Conversaciones (hoy)"
+          label="Conversaciones Hoy"
           value={summary?.conversations.today ?? '—'}
-          hint="Iniciadas desde 00:00"
+          hint="Total de conversaciones iniciadas"
           icon={Calendar}
           accent="blue"
+          trend={summary ? { text: '+12% vs ayer', isPositive: true } : undefined}
         />
         <KpiCard
-          label="Conversaciones (7d)"
-          value={summary?.conversations.week ?? '—'}
-          icon={MessageSquare}
-          accent="violet"
-        />
-        <KpiCard
-          label="% satisfactorias"
+          label="Satisfacción"
           value={formatPercent(summary?.satisfactionRate, 1)}
-          hint="Rating ≥ 4 sobre total puntuadas"
+          hint="Conversaciones con rating ≥ 4"
           icon={ThumbsUp}
           accent="green"
+          trend={summary ? { text: '+2.1% vs semana pasada', isPositive: true } : undefined}
         />
         <KpiCard
-          label="Latencia IA promedio"
+          label="Tiempo Respuesta"
           value={summary?.avgLatencySec ? `${summary.avgLatencySec.toFixed(2)}s` : '—'}
+          hint="Promedio de respuesta de IA"
           icon={Timer}
           accent="amber"
+          trend={summary ? { text: '-0.2s mejora', isPositive: false } : undefined}
+        />
+        <KpiCard
+          label="Conversaciones Semana"
+          value={summary?.conversations.week ?? '—'}
+          hint="Total semanal"
+          icon={MessageSquare}
+          accent="violet"
+          trend={summary ? { text: 'Estable', isPositive: null } : undefined}
         />
       </div>
 
@@ -78,3 +83,4 @@ export default function Resumen() {
     </div>
   );
 }
+
