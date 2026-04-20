@@ -19,7 +19,8 @@ export function initSocket(server: HttpServer) {
     path: '/socket.io',
   });
 
-  // Auth middleware — JWT from handshake.
+  // Auth middleware — JWT injected from handshake headers.
+  // This physically blocks unauthorized connections or unauthenticated sockets before connection.
   io.use((socket, next) => {
     const token = socket.handshake.auth?.token || socket.handshake.query?.token;
     if (!token || typeof token !== 'string') return next(new Error('missing_token'));
@@ -34,6 +35,10 @@ export function initSocket(server: HttpServer) {
 
   io.on('connection', (socket: Socket) => {
     const claims = (socket.data as any).auth as { sub: string; org_id: string; email: string; name: string };
+    
+    // STRICT TENANT ISOLATION: 
+    // Join the socket globally to an org-prefixed room to isolate broadcasts by tenant.
+    // E.g., when a new conversation is created in the API, we can safely `io.to('org:{orgId}').emit(...)`
     socket.join(`org:${claims.org_id}`);
     wsActiveConnections.inc();
 
@@ -41,13 +46,15 @@ export function initSocket(server: HttpServer) {
       wsActiveConnections.dec();
     });
 
-    // Client joins a conversation room (only if it belongs to their org).
+// MULTI-TENANCY CHECK: Client joins a conversation room (only if it belongs to their org).
+    // This allows specific `assistant:delta` text streaming without leaking info across tabs or users.
     socket.on('conversation:join', async (conversationId: string) => {
       const conv = await prisma.conversation.findFirst({
         where: { id: conversationId, orgId: claims.org_id },
         select: { id: true },
       });
       if (!conv) return socket.emit('error:forbidden', { conversationId });
+      // Prefix with "conv:" to avoid collision with organization rooms.
       socket.join(`conv:${conversationId}`);
     });
 

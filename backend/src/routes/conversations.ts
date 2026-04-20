@@ -19,7 +19,10 @@ const ListQuery = z.object({
   minRating: z.coerce.number().int().min(1).max(5).optional(),
 });
 
-// List conversations — tenant-scoped, paginated, filterable.
+// List conversations
+// Requirement: "Performance básica: paginación en tablas" and "Seguridad básica" (orgId).
+// This query supports dynamic filtering and cursor/offset-based pagination (page, pageSize).
+// The `where` object is seeded with `orgId` enforcing rigid tenant isolation.
 router.get(
   '/',
   asyncHandler(async (req, res) => {

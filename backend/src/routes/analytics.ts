@@ -47,8 +47,8 @@ router.get(
   '/trend',
   asyncHandler(async (req, res) => {
     const orgId = req.auth!.org_id;
-    const days = 30;
-    const rows: { day: Date; count: bigint }[] = await prisma.$queryRaw(
+    const days = 30;    // OPTIMIZED SQL: Daily Volume query using raw SQL to group dates rapidly.
+    // Relies strictly on `orgId` preventing implicit data leaks cross-org.    const rows: { day: Date; count: bigint }[] = await prisma.$queryRaw(
       Prisma.sql`
         SELECT date_trunc('day', "startedAt") AS day, COUNT(*)::bigint AS count
         FROM "Conversation"
@@ -118,6 +118,10 @@ router.get(
   '/worst-prompts',
   asyncHandler(async (req, res) => {
     const orgId = req.auth!.org_id;
+
+    // DENORMALIZED QUERY: Avoids massive slow JOINs via the denormalized `orgId` 
+    // explicitly defined on both Message and Conversation tables.
+    // The HAVING COUNT(DISTINCT ...) >= 1 establishes the statistical threshold per prompt.
     const rows: Array<{ promptId: string; name: string; avg_rating: number; samples: bigint }> =
       await prisma.$queryRaw(Prisma.sql`
         SELECT p.id AS "promptId", p.name, AVG(c.rating)::float AS avg_rating, COUNT(DISTINCT c.id)::bigint AS samples

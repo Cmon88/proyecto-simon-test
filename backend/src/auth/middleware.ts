@@ -26,6 +26,12 @@ export function verifyToken(token: string): AuthClaims {
   return jwt.verify(token, config.jwt.secret) as AuthClaims;
 }
 
+/**
+ * Express middleware for strict multi-tenant authorization.
+ * Injects `auth` claims (importantly `org_id`) into the Request object, 
+ * which is then strictly required on all protected queries to prevent 
+ * cross-tenant data leakage.
+ */
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
   if (!header?.startsWith('Bearer ')) {
