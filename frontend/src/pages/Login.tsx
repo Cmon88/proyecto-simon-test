@@ -7,8 +7,8 @@ import { useAuth } from '@/stores/auth';
 export default function Login() {
   const navigate = useNavigate();
   const { token, login, loading } = useAuth();
-  const [email, setEmail] = useState('alice@acme.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   if (token) return <Navigate to="/resumen" replace />;
 
@@ -20,15 +20,6 @@ export default function Login() {
     } catch (err: any) {
       toast.error(err?.message === 'invalid_credentials' ? 'Credenciales inválidas' : 'Error al iniciar sesión');
     }
-  };
-
-  const presetAcme = () => {
-    setEmail('alice@acme.com');
-    setPassword('password123');
-  };
-  const presetGlobex = () => {
-    setEmail('bob@globex.com');
-    setPassword('password123');
   };
 
   return (
@@ -64,18 +55,6 @@ export default function Login() {
             Iniciar sesión
           </button>
         </form>
-
-        <div className="mt-6 pt-6 border-t border-slate-200">
-          <p className="text-xs text-slate-500 mb-2">Usuarios demo (2 organizaciones):</p>
-          <div className="flex gap-2">
-            <button type="button" onClick={presetAcme} className="btn-secondary flex-1 text-xs">
-              Acme Corp
-            </button>
-            <button type="button" onClick={presetGlobex} className="btn-secondary flex-1 text-xs">
-              Globex
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
