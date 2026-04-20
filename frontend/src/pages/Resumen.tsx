@@ -1,4 +1,5 @@
 ﻿import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { MessageSquare, ThumbsUp, Timer, Calendar } from 'lucide-react';
 import { api, SummaryDto, TrendPoint } from '@/lib/api';
@@ -6,6 +7,8 @@ import { KpiCard } from '@/components/KpiCard';
 import { formatPercent } from '@/lib/utils';
 
 export default function Resumen() {
+  const [convPeriod, setConvPeriod] = useState<'today' | 'week' | 'month'>('today');
+
   const { data: summary } = useQuery({
     queryKey: ['summary'],
     queryFn: () => api.get<SummaryDto>('/api/analytics/summary'),
@@ -40,19 +43,64 @@ export default function Resumen() {
     return { text: `${isImprovement ? '-' : '+'}${Math.abs(delta).toFixed(2)}s${isImprovement ? ' mejora' : ' peor'}`, isPositive: isImprovement };
   };
 
+  const getConvStats = () => {
+    switch (convPeriod) {
+      case 'today':
+        return {
+          value: summary?.conversations.today,
+          hint: 'Total de conversaciones (hoy)',
+          trend: getPercentTrend(summary?.conversations.today, summary?.conversations.yesterday, 'vs ayer'),
+        };
+      case 'week':
+        return {
+          value: summary?.conversations.week,
+          hint: 'Total de conversaciones (sem)',
+          trend: getPercentTrend(summary?.conversations.week, summary?.conversations.prevWeek, 'vs sem. pasada'),
+        };
+      case 'month':
+        return {
+          value: summary?.conversations.month,
+          hint: 'Total de conversaciones (30d)',
+          trend: undefined,
+        };
+    }
+  };
+  const convStats = getConvStats();
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-slate-900">Resumen</h1>
         <p className="text-sm text-slate-500 mt-1">Vista general del rendimiento de las conversaciones con IA</p>      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <KpiCard
-          label="Conversaciones Hoy"
-          value={summary?.conversations.today ?? '—'}
-          hint="Total de conversaciones iniciadas"
-          icon={Calendar}
+          label={
+            <div className="flex items-center gap-1 bg-slate-100/80 p-0.5 rounded-md w-fit -mt-1 -ml-1">
+              <button 
+                onClick={() => setConvPeriod('today')} 
+                className={`px-2 py-1 text-xs rounded transition-all ${convPeriod === 'today' ? 'bg-white shadow-sm font-medium text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Hoy
+              </button>
+              <button 
+                onClick={() => setConvPeriod('week')} 
+                className={`px-2 py-1 text-xs rounded transition-all ${convPeriod === 'week' ? 'bg-white shadow-sm font-medium text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Sem.
+              </button>
+              <button 
+                onClick={() => setConvPeriod('month')} 
+                className={`px-2 py-1 text-xs rounded transition-all ${convPeriod === 'month' ? 'bg-white shadow-sm font-medium text-slate-800' : 'text-slate-500 hover:text-slate-700'}`}
+              >
+                Mes
+              </button>
+            </div>
+          }
+          value={convStats.value ?? '—'}
+          hint={convStats.hint}
+          icon={MessageSquare}
           accent="blue"
-          trend={getPercentTrend(summary?.conversations.today, summary?.conversations.yesterday, 'vs ayer')}
+          trend={convStats.trend}
         />
         <KpiCard
           label="Satisfacción"
@@ -69,14 +117,6 @@ export default function Resumen() {
           icon={Timer}
           accent="amber"
           trend={getLatencyTrend(summary?.avgLatencySec, summary?.prevAvgLatencySec)}
-        />
-        <KpiCard
-          label="Conversaciones Semana"
-          value={summary?.conversations.week ?? '—'}
-          hint="Total semanal"
-          icon={MessageSquare}
-          accent="violet"
-          trend={getPercentTrend(summary?.conversations.week, summary?.conversations.prevWeek, 'vs sem. pasada')}
         />
       </div>
 
@@ -101,10 +141,11 @@ export default function Resumen() {
       </div>
 
       <p className="text-xs text-slate-400">
-        Mes (30d): <strong>{summary?.conversations.month ?? '—'}</strong> · Rating promedio:{' '}
+        Rating promedio:{' '}
         <strong>{summary?.avgRating ? summary.avgRating.toFixed(2) : '—'}</strong>
       </p>
     </div>
   );
 }
+
 
