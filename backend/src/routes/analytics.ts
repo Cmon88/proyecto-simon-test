@@ -56,6 +56,10 @@ router.get(
       avgRating: ratingAgg._avg.rating,
       avgLatencySec: latencyAgg._avg.latencyMs ? latencyAgg._avg.latencyMs / 1000 : null,
       prevAvgLatencySec: prevLatencyAgg._avg.latencyMs ? prevLatencyAgg._avg.latencyMs / 1000 : null,
+    });
+  })
+);
+
 // Daily volume trend over last 30 days.
 router.get(
   '/trend',
