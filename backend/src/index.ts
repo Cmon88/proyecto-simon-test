@@ -6,6 +6,7 @@ import authRoutes from './auth/routes.js';
 import conversationRoutes from './routes/conversations.js';
 import analyticsRoutes from './routes/analytics.js';
 import promptRoutes from './routes/prompts.js';
+import configRoutes from './routes/config.js';
 import { metricsMiddleware, registry } from './metrics.js';
 import { initSocket } from './ws/index.js';
 
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/conversations', conversationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/prompts', promptRoutes);
+app.use('/api/config', configRoutes);
 
 // Generic error handler.
 app.use((err: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

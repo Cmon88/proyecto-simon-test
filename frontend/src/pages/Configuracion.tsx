@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { CheckCircle2, Plus, Trash2 } from 'lucide-react';
-import { api, Prompt } from '@/lib/api';
+import { api, Prompt, AiConfigDto } from '@/lib/api';
 import { useAuth } from '@/stores/auth';
 
 export default function Configuracion() {
@@ -14,6 +14,11 @@ export default function Configuracion() {
   const { data: prompts } = useQuery({
     queryKey: ['prompts'],
     queryFn: () => api.get<Prompt[]>('/api/prompts'),
+  });
+
+  const { data: aiConfig } = useQuery({
+    queryKey: ['aiConfig'],
+    queryFn: () => api.get<AiConfigDto>('/api/config/ai'),
   });
 
   const create = useMutation({
@@ -81,28 +86,29 @@ export default function Configuracion() {
         <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
           <div>
             <dt className="label">Proveedor</dt>
-            <dd className="mt-1 px-3 py-2 bg-slate-50 rounded border border-slate-200 text-slate-600">Groq (OpenAI-compatible)</dd>
+            <dd className="mt-1 px-3 py-2 bg-slate-50 rounded border border-slate-200 text-slate-600">
+              {aiConfig?.provider || 'Cargando...'}
+            </dd>
           </div>
           <div>
             <dt className="label">Modelo</dt>
-            <dd className="mt-1 px-3 py-2 bg-slate-50 rounded border border-slate-200 text-slate-600">configurado en <code>AI_MODEL</code></dd>
+            <dd className="mt-1 px-3 py-2 bg-slate-50 rounded border border-slate-200 text-slate-600">
+              {aiConfig?.model || 'Cargando...'}
+            </dd>
           </div>
           <div>
             <dt className="label">Endpoint</dt>
             <dd className="mt-1 px-3 py-2 bg-slate-50 rounded border border-slate-200 text-slate-600">
-              <code>AI_BASE_URL</code>
+              {aiConfig?.baseUrl || 'Cargando...'}
             </dd>
           </div>
           <div>
             <dt className="label">API Key</dt>
-            <dd className="mt-1 px-3 py-2 bg-slate-50 rounded border border-slate-200 text-slate-500">
-              configurada en variable de entorno (oculta por seguridad)
+            <dd className="mt-1 px-3 py-2 bg-slate-50 rounded border border-slate-200 text-slate-500 font-mono">
+              {aiConfig?.apiKeyMasked || 'Cargando...'}
             </dd>
           </div>
         </dl>
-        <p className="text-xs text-slate-400 mt-3">
-          Estos valores no son editables desde la UI; se configuran en el <code>.env</code> del backend.
-        </p>
       </div>
 
       {/* Prompts */}

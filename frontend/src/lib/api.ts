@@ -79,6 +79,13 @@ export interface Prompt {
   createdAt: string;
 }
 
+export interface AiConfigDto {
+  provider: string;
+  model: string;
+  baseUrl: string;
+  apiKeyMasked: string;
+}
+
 export interface SummaryDto {
   conversations: { today: number; yesterday: number; week: number; prevWeek: number; month: number };
   satisfactionRate: number | null;
