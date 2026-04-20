@@ -35,8 +35,7 @@ export const aiApiRequestDuration = new client.Histogram({
 
 // Normalize req.path to a bounded label set (route pattern if available).
 function routeLabel(req: Request): string {
-  // @ts-expect-error express types
-  const route = (req.route && req.route.path) || req.baseUrl + (req.path === '/' ? '' : req.path);
+  const route = ((req as any).route && (req as any).route.path) || req.baseUrl + (req.path === '/' ? '' : req.path);
   // Collapse cuid-ish ids to :id to avoid cardinality explosion
   return route.replace(/\/[a-z0-9]{20,}/gi, '/:id');
 }
