@@ -18,12 +18,10 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: '**/package-lock.json'
 
     # Backend
     - name: Install dependencies (Backend)
-      run: npm ci
+      run: npm install
       working-directory: ./backend
 
     - name: Run linting (Backend)
@@ -32,7 +30,7 @@ jobs:
 
     # Frontend
     - name: Install dependencies (Frontend)
-      run: npm ci
+      run: npm install
       working-directory: ./frontend
 
     - name: Run linting (Frontend)
