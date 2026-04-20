@@ -116,6 +116,7 @@ export default function Conversaciones() {
           <label className="label text-xs">Desde</label>
           <input
             type="date" className="input mt-1"
+            max={filters.to?.split('T')[0]}
             onChange={(e) => setFilters({ ...filters, from: e.target.value ? new Date(e.target.value).toISOString() : undefined, page: 1 })}
           />
         </div>
@@ -123,6 +124,7 @@ export default function Conversaciones() {
           <label className="label text-xs">Hasta</label>
           <input
             type="date" className="input mt-1"
+            min={filters.from?.split('T')[0]}
             onChange={(e) => setFilters({ ...filters, to: e.target.value ? new Date(e.target.value).toISOString() : undefined, page: 1 })}
           />
         </div>
