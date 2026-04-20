@@ -1,0 +1,97 @@
+// Simon — Prisma schema
+// Multi-tenant by org_id. Every tenant-scoped row has orgId FK + index.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  createdAt     DateTime       @default(now())
+  users         User[]
+  conversations Conversation[]
+  prompts       Prompt[]
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  passwordHash  String
+  avatarUrl     String?
+  orgId         String
+  org           Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+
+  @@index([orgId])
+}
+
+enum ConversationStatus {
+  OPEN
+  CLOSED
+}
+
+enum Channel {
+  WEB
+  WHATSAPP
+  INSTAGRAM
+}
+
+model Conversation {
+  id         String             @id @default(cuid())
+  orgId      String
+  org        Organization       @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  title      String?
+  channel    Channel            @default(WEB)
+  status     ConversationStatus @default(OPEN)
+  rating     Int?               // 1..5
+  startedAt  DateTime           @default(now())
+  endedAt    DateTime?
+  messages   Message[]
+
+  @@index([orgId, startedAt])
+  @@index([orgId, status])
+  @@index([orgId, rating])
+  @@index([orgId, channel])
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  orgId          String       // denormalized for fast tenant filtering
+  role           MessageRole
+  content        String
+  promptId       String?      // prompt used when role=ASSISTANT (for "worst prompts" analytics)
+  latencyMs      Int?         // AI response latency
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+  @@index([orgId, createdAt])
+  @@index([orgId, promptId])
+}
+
+model Prompt {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name      String
+  content   String
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([orgId])
+  @@unique([orgId, name])
+}
