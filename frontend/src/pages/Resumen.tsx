@@ -21,7 +21,7 @@ export default function Resumen() {
   const getPercentTrend = (current?: number, prev?: number, suffix = '') => {
     if (current == null || prev == null) return undefined;
     const delta = current - prev;
-    if (delta === 0) return { text: 'Estable', isPositive: null };
+    if (delta === 0) return { text: 'Estable vs sem. pasada', isPositive: null };
     if (prev === 0) return { text: `+${current} ${suffix}`, isPositive: true };
     const pct = Math.round((delta / prev) * 100);
     return { text: `${pct > 0 ? '+' : ''}${pct}% ${suffix}`, isPositive: delta > 0 };
@@ -30,7 +30,7 @@ export default function Resumen() {
   const getRateTrend = (current: number | null | undefined, prev: number | null | undefined, suffix = '') => {
     if (current == null || prev == null) return undefined;
     const delta = current - prev;
-    if (delta === 0) return { text: 'Estable', isPositive: null };
+    if (delta === 0) return { text: 'Estable vs sem. pasada', isPositive: null };
     const pct = (delta * 100).toFixed(1);
     return { text: `${delta > 0 ? '+' : ''}${pct}% ${suffix}`, isPositive: delta > 0 };
   };
@@ -38,9 +38,9 @@ export default function Resumen() {
   const getLatencyTrend = (current: number | null | undefined, prev: number | null | undefined) => {
     if (current == null || prev == null) return undefined;
     const delta = current - prev;
-    if (Math.abs(delta) < 0.01) return { text: 'Estable', isPositive: null };
+    if (Math.abs(delta) < 0.01) return { text: 'Estable vs sem. pasada', isPositive: null };
     const isImprovement = delta < 0;
-    return { text: `${isImprovement ? '-' : '+'}${Math.abs(delta).toFixed(2)}s${isImprovement ? ' mejora' : ' peor'}`, isPositive: isImprovement };
+    return { text: `${isImprovement ? '-' : '+'}${Math.abs(delta).toFixed(2)}s${isImprovement ? ' mejora' : ' peor'} vs sem. pasada`, isPositive: isImprovement };
   };
 
   const getConvStats = () => {
@@ -61,7 +61,7 @@ export default function Resumen() {
         return {
           value: summary?.conversations.month,
           hint: 'Total de conversaciones (30d)',
-          trend: undefined,
+          trend: getPercentTrend(summary?.conversations.month, summary?.conversations.prevMonth, 'vs mes pasado'),
         };
     }
   };
@@ -147,5 +147,6 @@ export default function Resumen() {
     </div>
   );
 }
+
 
 

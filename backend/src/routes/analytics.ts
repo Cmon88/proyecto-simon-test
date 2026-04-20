@@ -20,9 +20,10 @@ router.get(
     // For calculating trends
     const startOfYesterday = new Date(startOfDay); startOfYesterday.setDate(startOfDay.getDate() - 1);
     const startOfPrevWeek = new Date(startOfWeek); startOfPrevWeek.setDate(startOfWeek.getDate() - 7);
+    const startOfPrevMonth = new Date(startOfMonth); startOfPrevMonth.setDate(startOfMonth.getDate() - 30);
 
     const [
-      today, yesterday, week, prevWeek, month, 
+      today, yesterday, week, prevWeek, month, prevMonth,
       ratingAgg, latencyAgg, prevLatencyAgg,
       ratedCount, satisfactory, prevRatedCount, prevSatisfactory
     ] = await Promise.all([
@@ -31,6 +32,7 @@ router.get(
       prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfWeek } } }),
       prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfPrevWeek, lt: startOfWeek } } }),
       prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfMonth } } }),
+      prisma.conversation.count({ where: { orgId, startedAt: { gte: startOfPrevMonth, lt: startOfMonth } } }),
       prisma.conversation.aggregate({
         where: { orgId, rating: { not: null } },
         _avg: { rating: true },
@@ -50,7 +52,7 @@ router.get(
     ]);
 
     res.json({
-      conversations: { today, yesterday, week, prevWeek, month },
+      conversations: { today, yesterday, week, prevWeek, month, prevMonth },
       satisfactionRate: ratedCount === 0 ? null : satisfactory / ratedCount,
       prevSatisfactionRate: prevRatedCount === 0 ? null : prevSatisfactory / prevRatedCount,
       avgRating: ratingAgg._avg.rating,

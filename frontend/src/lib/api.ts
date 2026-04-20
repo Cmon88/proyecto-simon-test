@@ -87,7 +87,7 @@ export interface AiConfigDto {
 }
 
 export interface SummaryDto {
-  conversations: { today: number; yesterday: number; week: number; prevWeek: number; month: number };
+  conversations: { today: number; yesterday: number; week: number; prevWeek: number; month: number; prevMonth: number };
   satisfactionRate: number | null;
   prevSatisfactionRate: number | null;
   avgRating: number | null;
